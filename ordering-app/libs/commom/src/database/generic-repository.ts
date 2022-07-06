@@ -6,6 +6,8 @@ import {
   Model,
   ProjectionType,
   QueryOptions,
+  SaveOptions,
+  Types,
   UpdateQuery,
 } from 'mongoose';
 
@@ -36,18 +38,21 @@ export abstract class EntityRepository<T extends Document> {
     return await this.entityModel.find(filter, projection, options).exec();
   }
 
-  async create(entity: unknown): Promise<T> {
-    const doc = new this.entityModel(entity);
-    return await doc.save();
+  async create(document: any, options?: SaveOptions): Promise<T> {
+    const createdDocument = new this.entityModel({
+      ...document,
+      _id: new Types.ObjectId(),
+    });
+    return (await createdDocument.save(options)).toJSON() as unknown as T;
   }
 
   async findOneAndUpdate(
     filterQuery: FilterQuery<T>,
     update: UpdateQuery<T>,
+    options: Partial<{ lean: boolean; upsert: boolean; new: boolean }>,
   ): Promise<T | null> {
-    const doc = this.entityModel.findOneAndUpdate(filterQuery, update, {
-      new: true,
-    });
+    options = { new: true };
+    const doc = this.entityModel.findOneAndUpdate(filterQuery, update, options);
     if (!doc) {
       this.logger.warn('Document not found with filterQuery', filterQuery);
       throw new NotFoundException('Document not found');
@@ -64,7 +69,7 @@ export abstract class EntityRepository<T extends Document> {
     filterQuery: FilterQuery<T>,
     document: Partial<T>,
   ): Promise<T | null> {
-    return await this.entityModel.findOneAndUpdate(filterQuery, document, {
+    return await this.findOneAndUpdate(filterQuery, document, {
       lean: true,
       upsert: true,
       new: true,
