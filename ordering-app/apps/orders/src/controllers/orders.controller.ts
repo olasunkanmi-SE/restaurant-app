@@ -16,4 +16,9 @@ export class OrdersController {
   async createUser(@Body() createOrderParams: CreateOrderDTO) {
     return await this.ordersService.createUser(createOrderParams);
   }
+
+  @Get('/cache')
+  async getCached() {
+    return await this.ordersService.getHello();
+  }
 }

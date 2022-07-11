@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { BaseDocument } from './../../../../libs/commom/src/database/base-document';
+import { BaseDocument } from '../../../../libs/commom/src/database/mongodb/base-document';
 
 export type OrderDocument = Order & Document;
 

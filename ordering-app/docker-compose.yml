@@ -1,53 +1,15 @@
 services:
-  orders:
-    build:
-      dockerfile: ./apps/orders/Dockerfile
-      context: .
-      target: ${NODE_ENV}
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    command: npm run start:dev orders
-    depends_on:
-      - mongodb-primary
-      - mongodb-secondary
-      - mongodb-arbiter
+  redis:
+    image: docker.io/bitnami/redis:7.0
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     ports:
-      - 3000:3000
-    restart: always
-
-  mongodb-primary:
-    image: docker.io/bitnami/mongodb:5.0
-    environment:
-      - MONGODB_ADVERTISED_HOSTNAME=${MONGODB_ADVERTISED_HOSTNAME_PRIMARY}
-      - MONGODB_REPLICA_SET_MODE=${MONGODB_REPLICA_SET_MODE_PRIMARY}
-      - MONGODB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}
-      - MONGODB_REPLICA_SET_KEY=${MONGODB_REPLICA_SET_KEY}
+      - '6379:6379'
     volumes:
-      - 'mongodb_master_data:/bitnami/mongodb'
-
-  mongodb-secondary:
-    image: docker.io/bitnami/mongodb:5.0
-    depends_on:
-      - mongodb-primary
-    environment:
-      - MONGODB_ADVERTISED_HOSTNAME=${MONGODB_ADVERTISED_HOSTNAME_PRIMARY}
-      - MONGODB_REPLICA_SET_MODE=${MONGODB_REPLICA_SET_MODE_PRIMARY}
-      - MONGODB_INITIAL_PRIMARY_HOST=${MONGODB_INITIAL_PRIMARY_HOST}
-      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=${MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD}
-      - MONGODB_REPLICA_SET_KEY=${MONGODB_REPLICA_SET_KEY}
-
-  mongodb-arbiter:
-    image: docker.io/bitnami/mongodb:5.0
-    depends_on:
-      - mongodb-primary
-    environment:
-      - MONGODB_ADVERTISED_HOSTNAME_ARBITER=${MONGODB_ADVERTISED_HOSTNAME_ARBITER}
-      - MONGODB_REPLICA_SET_MODE_ARBITER=${MONGODB_REPLICA_SET_MODE_ARBITER}
-      - MONGODB_INITIAL_PRIMARY_HOST=${MONGODB_INITIAL_PRIMARY_HOST}
-      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=${MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD}
-      - MONGODB_REPLICA_SET_KEY=${MONGODB_REPLICA_SET_KEY}
+      - 'redis_data:/bitnami/redis/data'
 
 volumes:
-  mongodb_master_data:
+  redis_data:
     driver: local
