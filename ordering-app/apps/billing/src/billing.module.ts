@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
-import { RabbitMQModule } from 'libs/commom/src/rabbitMQ/rabbitmq-module';
+import { KafkaModule } from 'libs/commom/src';
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
+import { billingConstant } from './constants/billing-constant';
 
 @Module({
-  imports: [RabbitMQModule],
+  imports: [
+    KafkaModule.register({
+      name: billingConstant.AUTH_SERVICE,
+      groupId: billingConstant.AUTH_CONSUMER,
+      clientId: billingConstant.AUTH_CLIENT_ID,
+    }),
+  ],
   controllers: [BillingController],
   providers: [BillingService],
 })

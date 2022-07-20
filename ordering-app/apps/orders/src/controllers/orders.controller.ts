@@ -13,7 +13,7 @@ export class OrdersController {
   }
 
   @Post()
-  async createUser(@Body() createOrderParams: CreateOrderDTO) {
-    return await this.ordersService.createUser(createOrderParams);
+  async createOrder(@Body() createOrderParams: CreateOrderDTO) {
+    return await this.ordersService.createOrder(createOrderParams);
   }
 }

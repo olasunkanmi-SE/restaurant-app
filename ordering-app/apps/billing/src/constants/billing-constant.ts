@@ -1,0 +1,5 @@
+export const billingConstant = {
+  AUTH_SERVICE: 'AUTH_SERVICE',
+  AUTH_CLIENT_ID: 'AUTH_CLIENT_ID',
+  AUTH_CONSUMER: 'AUTH_CONSUMER',
+};

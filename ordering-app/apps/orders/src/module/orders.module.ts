@@ -7,6 +7,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { DocumentDatabaseModule } from '../../../../libs/commom/src/database/database-module';
 import { Order, OrderSchema } from '../schema/order-schema';
 import { OrdersRepository } from '../repository/order-repository';
+import { KafkaModule } from 'libs/commom/src';
+import { orderConstants } from '../constants';
 
 @Module({
   imports: [
@@ -19,6 +21,11 @@ import { OrdersRepository } from '../repository/order-repository';
     }),
     DocumentDatabaseModule,
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
+    KafkaModule.register({
+      name: orderConstants.BILLING_SERVICE,
+      groupId: orderConstants.BILLING_CONSUMER,
+      clientId: orderConstants.BILLING,
+    }),
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersRepository],
